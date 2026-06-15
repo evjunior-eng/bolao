@@ -8,7 +8,6 @@
   :root {
     --green: #1a7a4a;
     --green-light: #e8f5ee;
-    --green-mid: #2da865;
     --gold: #c9a227;
     --gold-light: #fdf6e3;
     --text: #1a1a1a;
@@ -22,102 +21,74 @@
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
-
   header { background: var(--green); color: white; padding: 1rem 1.25rem; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
   header h1 { font-size: 16px; font-weight: 600; }
   .header-sub { font-size: 11px; opacity: 0.75; margin-top: 1px; }
-
   nav { background: var(--white); border-bottom: 1px solid var(--border); display: flex; overflow-x: auto; }
   nav button { flex: 1; min-width: 80px; padding: 12px 8px; font-size: 13px; font-weight: 500; color: var(--text-muted); border: none; background: none; cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; }
   nav button.active { color: var(--green); border-bottom-color: var(--green); }
-
   main { max-width: 520px; margin: 0 auto; padding: 1.25rem 1rem 4rem; }
-
   .section { display: none; }
   .section.active { display: block; }
-
   .card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; margin-bottom: 1rem; }
   .card-title { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 1rem; }
-
   label { font-size: 13px; color: var(--text-muted); display: block; margin-bottom: 4px; margin-top: 14px; }
   label:first-of-type { margin-top: 0; }
-  input[type="text"], input[type="password"], input[type="number"], select {
-    width: 100%; padding: 10px 12px; font-size: 15px;
-    border: 1px solid var(--border); border-radius: var(--radius-sm);
-    background: var(--white); color: var(--text); outline: none;
-  }
+  input[type="text"], input[type="password"], input[type="number"], select { width: 100%; padding: 10px 12px; font-size: 15px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--white); color: var(--text); outline: none; }
   input:focus, select:focus { border-color: var(--green); }
+  input:disabled, select:disabled { background: #f0f0f0; color: var(--text-muted); cursor: not-allowed; }
   .score-row { display: flex; align-items: center; gap: 10px; }
   .score-row input { width: 72px; text-align: center; font-size: 22px; font-weight: 600; }
   .score-sep { font-size: 20px; color: var(--text-muted); }
   .score-teams { display: flex; justify-content: space-between; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--text-muted); }
-
   .btn { display: block; width: 100%; padding: 12px; font-size: 15px; font-weight: 600; border-radius: var(--radius-sm); border: none; cursor: pointer; margin-top: 16px; }
   .btn-green { background: var(--green); color: white; }
   .btn-outline { background: transparent; color: var(--green); border: 1px solid var(--green); }
   .btn-sm { display: inline-block; width: auto; padding: 6px 14px; font-size: 13px; margin-top: 0; }
   .btn-copy { background: var(--gold); color: white; }
   .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
   .msg { font-size: 13px; text-align: center; margin-top: 10px; padding: 8px; border-radius: var(--radius-sm); display: none; }
   .msg-ok { background: var(--green-light); color: var(--green); }
   .msg-err { background: #fde8e8; color: var(--red); }
-
   .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
   .chip { background: var(--green-light); color: var(--green); border-radius: 20px; padding: 5px 14px; font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 6px; }
   .chip-remove { background: none; border: none; color: var(--green); font-size: 18px; cursor: pointer; line-height: 1; padding: 0; opacity: 0.6; }
-
   .rank-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); }
   .rank-row:last-child { border-bottom: none; }
   .rank-name { font-size: 15px; font-weight: 600; flex: 1; }
   .rank-detail { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
   .rank-pts { font-size: 22px; font-weight: 700; color: var(--green); }
   .rank-pts-label { font-size: 11px; color: var(--text-muted); text-align: right; }
-  .medal { font-size: 16px; margin-right: 4px; }
-
   .game-item { padding: 10px 0; border-bottom: 1px solid var(--border); }
   .game-item:last-child { border-bottom: none; }
   .game-name { font-size: 14px; font-weight: 600; }
   .game-meta { font-size: 12px; color: var(--text-muted); margin-top: 2px; display: flex; align-items: center; gap: 8px; }
-  .badge-resultado { background: var(--green-light); color: var(--green); font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px; }
-  .badge-pendente { background: #fff3cd; color: #856404; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px; }
-
+  .badge-ok { background: var(--green-light); color: var(--green); font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px; }
+  .badge-wait { background: #fff3cd; color: #856404; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px; }
   .pal-item { padding: 10px 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
   .pal-item:last-child { border-bottom: none; }
-  .pal-jogo { font-size: 14px; font-weight: 500; }
   .pal-score { font-size: 16px; font-weight: 700; color: var(--green); }
   .pts-badge { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 20px; }
   .pts-2 { background: var(--gold-light); color: var(--gold); }
   .pts-1 { background: var(--green-light); color: var(--green); }
   .pts-0 { background: #f0f0f0; color: var(--text-muted); }
-
   .login-screen { max-width: 340px; margin: 3rem auto; }
   .login-screen .card { text-align: center; }
   .login-icon { font-size: 40px; margin-bottom: 1rem; }
-
   .empty { text-align: center; padding: 2rem 0; color: var(--text-muted); font-size: 14px; }
-
   textarea.ranking-txt { width: 100%; height: 140px; font-size: 13px; font-family: monospace; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px; resize: none; background: var(--bg); color: var(--text); margin-top: 10px; }
-
   .welcome-banner { background: var(--green); color: white; border-radius: var(--radius); padding: 1.25rem; margin-bottom: 1rem; }
   .welcome-banner h2 { font-size: 18px; font-weight: 700; }
   .welcome-banner p { font-size: 13px; opacity: 0.85; margin-top: 4px; }
-
-  .loading-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.85); display: flex; align-items: center; justify-content: center; z-index: 999; font-size: 15px; color: var(--green); font-weight: 600; }
+  .aviso-lock { display: none; margin-top: 10px; font-size: 13px; color: var(--text-muted); text-align: center; background: #f0f0f0; padding: 8px; border-radius: var(--radius-sm); }
+  .loading-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; z-index: 999; font-size: 15px; color: var(--green); font-weight: 600; }
   .spinner { width: 32px; height: 32px; border: 3px solid var(--green-light); border-top-color: var(--green); border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 12px; }
   @keyframes spin { to { transform: rotate(360deg); } }
-
-  @media (max-width: 400px) {
-    main { padding: 1rem 0.75rem 4rem; }
-    .score-row input { width: 60px; font-size: 18px; }
-  }
 </style>
 </head>
 <body>
 
-<div class="loading-overlay" id="loading">
-  <div class="spinner"></div> Carregando...
-</div>
+<div class="loading-overlay" id="loading"><div class="spinner"></div> Carregando...</div>
 
 <header>
   <div>
@@ -135,18 +106,13 @@
 
 <main>
 
-  <!-- SELEÇÃO -->
   <div id="screen-select" class="section active">
-    <div class="welcome-banner">
-      <h2>Olá! 👋</h2>
-      <p>Selecione seu nome para registrar seus palpites e acompanhar o ranking.</p>
-    </div>
+    <div class="welcome-banner"><h2>Olá! 👋</h2><p>Selecione seu nome para registrar seus palpites e acompanhar o ranking.</p></div>
     <div class="card">
       <div class="card-title">Quem é você?</div>
       <select id="select-nome" style="font-size:16px;padding:12px" onchange="entrarComoParticipante()">
         <option value="">Selecione seu nome...</option>
       </select>
-      <div class="msg msg-err" id="msg-select-err">Selecione um nome para continuar.</div>
     </div>
     <div class="card" style="text-align:center">
       <div style="font-size:13px;color:var(--text-muted);margin-bottom:10px">Você é o administrador?</div>
@@ -154,7 +120,6 @@
     </div>
   </div>
 
-  <!-- LOGIN ADMIN -->
   <div id="screen-admin-login" class="section">
     <div class="login-screen">
       <div class="card">
@@ -169,28 +134,23 @@
     </div>
   </div>
 
-  <!-- MEUS PALPITES -->
   <div id="tab-meus-palpites" class="section">
     <div class="card">
       <div class="card-title">Inserir palpite</div>
       <label>Jogo</label>
       <select id="pal-jogo" onchange="onPalJogoChange()"><option value="">Selecione o jogo...</option></select>
       <div id="pal-teams" style="margin-top:12px;display:none">
-        <div class="score-teams">
-          <span id="pal-team1-label">Time 1</span>
-          <span id="pal-team2-label">Time 2</span>
-        </div>
+        <div class="score-teams"><span id="pal-team1-label">Time 1</span><span id="pal-team2-label">Time 2</span></div>
         <div class="score-row">
           <input type="number" id="pal-g1" min="0" max="20" value="0" />
           <span class="score-sep">×</span>
           <input type="number" id="pal-g2" min="0" max="20" value="0" />
         </div>
       </div>
+      <div id="aviso-lock" class="aviso-lock">🔒 Palpite já registrado. Só o admin pode alterar.</div>
       <button class="btn btn-green" id="btn-salvar-pal" onclick="salvarPalpite()">Salvar palpite</button>
-      <div id="aviso-bloqueado" style="display:none;margin-top:10px;font-size:13px;color:var(--text-muted);text-align:center;background:#f0f0f0;padding:8px;border-radius:var(--radius-sm)">🔒 Palpite já registrado. Só o admin pode alterar.</div>
       <div class="msg msg-ok" id="msg-pal-ok">Palpite salvo!</div>
       <div class="msg msg-err" id="msg-pal-err">Selecione um jogo.</div>
-      <div class="msg msg-err" id="msg-pal-bloqueado">Palpite já registrado. Não é possível alterar.</div>
     </div>
     <div class="card">
       <div class="card-title">Meus palpites registrados</div>
@@ -198,7 +158,6 @@
     </div>
   </div>
 
-  <!-- RANKING -->
   <div id="tab-ranking" class="section">
     <div class="card">
       <div class="card-title">Classificação geral</div>
@@ -212,8 +171,8 @@
     </div>
   </div>
 
-  <!-- ADMIN -->
   <div id="tab-admin" class="section">
+
     <div class="card">
       <div class="card-title">Participantes</div>
       <label>Nome</label>
@@ -231,11 +190,7 @@
       </div>
       <label>Fase</label>
       <select id="jogo-fase">
-        <option>Fase de grupos</option>
-        <option>Oitavas</option>
-        <option>Quartas</option>
-        <option>Semifinal</option>
-        <option>Final</option>
+        <option>Fase de grupos</option><option>Oitavas</option><option>Quartas</option><option>Semifinal</option><option>Final</option>
       </select>
       <button class="btn btn-green" onclick="addJogo()">Adicionar jogo</button>
       <div class="msg msg-ok" id="msg-jogo-ok">Jogo adicionado!</div>
@@ -247,10 +202,7 @@
       <label>Jogo</label>
       <select id="res-jogo" onchange="onResJogoChange()"><option value="">Selecione...</option></select>
       <div id="res-teams" style="margin-top:12px;display:none">
-        <div class="score-teams">
-          <span id="res-team1-label">Time 1</span>
-          <span id="res-team2-label">Time 2</span>
-        </div>
+        <div class="score-teams"><span id="res-team1-label">Time 1</span><span id="res-team2-label">Time 2</span></div>
         <div class="score-row">
           <input type="number" id="res-g1" min="0" max="20" value="0" />
           <span class="score-sep">×</span>
@@ -269,10 +221,7 @@
       <label>Jogo</label>
       <select id="admin-pal-jogo" onchange="onAdminPalChange()"><option value="">Selecione...</option></select>
       <div id="admin-pal-teams" style="margin-top:12px;display:none">
-        <div class="score-teams">
-          <span id="admin-pal-team1">Time 1</span>
-          <span id="admin-pal-team2">Time 2</span>
-        </div>
+        <div class="score-teams"><span id="admin-pal-team1">Time 1</span><span id="admin-pal-team2">Time 2</span></div>
         <div class="score-row">
           <input type="number" id="admin-pal-g1" min="0" max="20" value="0" />
           <span class="score-sep">×</span>
@@ -285,20 +234,21 @@
     </div>
 
     <div class="card">
+      <div class="card-title">Configurações</div>
       <label>Nova senha admin</label>
       <input type="password" id="nova-senha" placeholder="Digite a nova senha" />
       <button class="btn btn-outline" onclick="mudarSenha()">Alterar senha</button>
       <div class="msg msg-ok" id="msg-senha-ok">Senha alterada!</div>
       <button class="btn" style="background:#f0f0f0;color:var(--text-muted);margin-top:8px" onclick="sair()">Sair</button>
     </div>
+
   </div>
 
 </main>
 
-<!-- Firebase SDKs -->
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot, collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { getFirestore, doc, getDoc, setDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyAu1Cl5s6UYkR4ssIwtkVkTKNSBxLiLYNA",
@@ -312,94 +262,94 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Refs
 const configRef = doc(db, 'bolao', 'config');
 const jogosRef = doc(db, 'bolao', 'jogos');
 const palpitesRef = doc(db, 'bolao', 'palpites');
 const resultadosRef = doc(db, 'bolao', 'resultados');
 
-let state = {
-  participantes: [],
-  jogos: [],
-  palpites: {},
-  resultados: {},
-  senha: 'copa2026'
-};
+let state = { participantes: [], jogos: [], palpites: {}, resultados: {}, senha: 'copa2026' };
 let currentUser = null;
 let isAdmin = false;
-let unsubscribes = [];
 
-// --- FIREBASE HELPERS ---
+// ---- FIREBASE ----
 async function loadAll() {
-  try {
-    const [cfgSnap, jogosSnap, palSnap, resSnap] = await Promise.all([
-      getDoc(configRef), getDoc(jogosRef), getDoc(palpitesRef), getDoc(resultadosRef)
-    ]);
-    if (cfgSnap.exists()) { const d = cfgSnap.data(); state.participantes = d.participantes || []; state.senha = d.senha || 'copa2026'; }
-    if (jogosSnap.exists()) state.jogos = jogosSnap.data().lista || [];
-    if (palSnap.exists()) state.palpites = palSnap.data() || {};
-    if (resSnap.exists()) state.resultados = resSnap.data() || {};
-  } catch(e) { console.error('Erro ao carregar:', e); }
+  const [c, j, p, r] = await Promise.all([
+    getDoc(configRef), getDoc(jogosRef), getDoc(palpitesRef), getDoc(resultadosRef)
+  ]);
+  if (c.exists()) { state.participantes = c.data().participantes || []; state.senha = c.data().senha || 'copa2026'; }
+  if (j.exists()) { state.jogos = j.data().lista || []; }
+  if (p.exists()) { state.palpites = p.data() || {}; }
+  if (r.exists()) { state.resultados = r.data() || {}; }
 }
 
-async function saveConfig() {
-  await setDoc(configRef, { participantes: state.participantes, senha: state.senha }, { merge: true });
-}
-async function saveJogos() {
-  await setDoc(jogosRef, { lista: state.jogos });
-}
-async function savePalpite(key, value) {
-  await setDoc(palpitesRef, { [key]: value }, { merge: true });
-}
-async function saveResultado(jogoId, value) {
-  await setDoc(resultadosRef, { [jogoId]: value }, { merge: true });
-}
-
-// Listeners em tempo real
 function startListeners() {
-  unsubscribes.forEach(u => u());
-  unsubscribes = [
-    onSnapshot(configRef, snap => {
-      if (snap.exists()) { const d = snap.data(); state.participantes = d.participantes || []; state.senha = d.senha || 'copa2026'; populateSelectNome(); if (isAdmin) renderAdmin(); }
-    }),
-    onSnapshot(jogosRef, snap => {
-      if (snap.exists()) { state.jogos = snap.data().lista || []; if (isAdmin) renderAdmin(); populatePalpiteJogoSelect(); }
-    }),
-    onSnapshot(palpitesRef, snap => {
-      if (snap.exists()) { state.palpites = snap.data() || {}; if (currentUser && !isAdmin) renderMeusPalpites(); }
-    }),
-    onSnapshot(resultadosRef, snap => {
-      if (snap.exists()) { state.resultados = snap.data() || {}; if (currentUser && !isAdmin) renderMeusPalpites(); renderRanking(); if (isAdmin) renderAdmin(); }
-    })
-  ];
+  onSnapshot(configRef, snap => {
+    if (!snap.exists()) return;
+    state.participantes = snap.data().participantes || [];
+    state.senha = snap.data().senha || 'copa2026';
+    populateSelectNome();
+    if (isAdmin) renderAdmin();
+  });
+  onSnapshot(jogosRef, snap => {
+    if (!snap.exists()) return;
+    state.jogos = snap.data().lista || [];
+    populatePalJogoSelect();
+    if (isAdmin) renderAdmin();
+  });
+  onSnapshot(palpitesRef, snap => {
+    if (!snap.exists()) return;
+    state.palpites = snap.data() || {};
+    if (currentUser && !isAdmin) renderMeusPalpites();
+  });
+  onSnapshot(resultadosRef, snap => {
+    if (!snap.exists()) return;
+    state.resultados = snap.data() || {};
+    if (currentUser && !isAdmin) renderMeusPalpites();
+    renderRanking();
+    if (isAdmin) renderAdmin();
+  });
 }
 
-// --- UI HELPERS ---
-function flash(id, duration) {
+async function saveConfig() { await setDoc(configRef, { participantes: state.participantes, senha: state.senha }); }
+async function saveJogos() { await setDoc(jogosRef, { lista: state.jogos }); }
+async function savePalpite(key, val) { await setDoc(palpitesRef, { [key]: val }, { merge: true }); }
+async function saveResultado(jogoId, val) { await setDoc(resultadosRef, { [jogoId]: val }, { merge: true }); }
+
+// ---- HELPERS ----
+function flash(id) {
   const el = document.getElementById(id);
   if (!el) return;
   el.style.display = 'block';
-  setTimeout(() => el.style.display = 'none', duration || 2500);
+  setTimeout(() => { el.style.display = 'none'; }, 2500);
 }
 
+function calcPontos(pal, res) {
+  if (pal.g1 === res.g1 && pal.g2 === res.g2) return 2;
+  const vr = res.g1 > res.g2 ? 1 : res.g1 < res.g2 ? 2 : 0;
+  const vp = pal.g1 > pal.g2 ? 1 : pal.g1 < pal.g2 ? 2 : 0;
+  return vr === vp ? 1 : 0;
+}
+
+// ---- NAV ----
 function showTab(name) {
-  ['meus-palpites','ranking','admin'].forEach(t => document.getElementById('tab-'+t).classList.remove('active'));
+  ['meus-palpites', 'ranking', 'admin'].forEach(t => {
+    document.getElementById('tab-' + t).classList.remove('active');
+  });
   document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab-'+name).classList.add('active');
-  const idx = ['meus-palpites','ranking','admin'].indexOf(name);
+  document.getElementById('tab-' + name).classList.add('active');
+  const idx = ['meus-palpites', 'ranking', 'admin'].indexOf(name);
   document.querySelectorAll('nav button')[idx].classList.add('active');
   if (name === 'ranking') renderRanking();
-  if (name === 'meus-palpites') { populatePalpiteJogoSelect(); renderMeusPalpites(); }
+  if (name === 'meus-palpites') { populatePalJogoSelect(); renderMeusPalpites(); }
   if (name === 'admin') renderAdmin();
 }
 window.showTab = showTab;
 
-// --- ENTRADA ---
+// ---- ENTRADA ----
 function populateSelectNome() {
   const sel = document.getElementById('select-nome');
-  const cur = sel.value;
   sel.innerHTML = '<option value="">Selecione seu nome...</option>' +
-    state.participantes.map(p => `<option value="${p}"${p===cur?' selected':''}>${p}</option>`).join('');
+    state.participantes.map(p => '<option value="' + p + '">' + p + '</option>').join('');
 }
 
 function entrarComoParticipante() {
@@ -410,7 +360,7 @@ function entrarComoParticipante() {
   document.getElementById('main-nav').style.display = 'flex';
   document.getElementById('btn-admin-tab').style.display = 'none';
   document.getElementById('header-sub').textContent = '👤 ' + nome;
-  populatePalpiteJogoSelect();
+  populatePalJogoSelect();
   renderMeusPalpites();
   showTab('meus-palpites');
 }
@@ -444,7 +394,9 @@ window.voltarInicio = voltarInicio;
 function sair() {
   currentUser = null; isAdmin = false;
   document.getElementById('main-nav').style.display = 'none';
-  ['meus-palpites','ranking','admin'].forEach(t => document.getElementById('tab-'+t).classList.remove('active'));
+  ['meus-palpites', 'ranking', 'admin'].forEach(t => {
+    document.getElementById('tab-' + t).classList.remove('active');
+  });
   document.getElementById('screen-select').classList.add('active');
   document.getElementById('admin-senha').value = '';
   document.getElementById('header-sub').textContent = 'Selecione seu nome para entrar';
@@ -452,37 +404,39 @@ function sair() {
 }
 window.sair = sair;
 
-// --- PALPITES ---
-function populatePalpiteJogoSelect() {
+// ---- PALPITES ----
+function populatePalJogoSelect() {
   const sel = document.getElementById('pal-jogo');
   sel.innerHTML = '<option value="">Selecione o jogo...</option>' +
-    state.jogos.map(j => `<option value="${j.id}">${j.time1} × ${j.time2} (${j.fase})</option>`).join('');
+    state.jogos.map(j => '<option value="' + j.id + '">' + j.time1 + ' × ' + j.time2 + ' (' + j.fase + ')</option>').join('');
   document.getElementById('pal-teams').style.display = 'none';
 }
 
 function onPalJogoChange() {
   const jogoId = document.getElementById('pal-jogo').value;
-  const jogo = state.jogos.find(j => j.id === jogoId);
+  const jogo = state.jogos.find(function(j) { return j.id === jogoId; });
   const div = document.getElementById('pal-teams');
+  const aviso = document.getElementById('aviso-lock');
+  const btn = document.getElementById('btn-salvar-pal');
   if (jogo) {
     document.getElementById('pal-team1-label').textContent = jogo.time1;
     document.getElementById('pal-team2-label').textContent = jogo.time2;
     const key = currentUser + '__' + jogoId;
     const existing = state.palpites[key];
-    const jaRegistrado = !!existing && !isAdmin;
+    const bloqueado = !!existing && !isAdmin;
     document.getElementById('pal-g1').value = existing ? existing.g1 : 0;
     document.getElementById('pal-g2').value = existing ? existing.g2 : 0;
-    document.getElementById('pal-g1').disabled = jaRegistrado;
-    document.getElementById('pal-g2').disabled = jaRegistrado;
-    const btn = document.getElementById('btn-salvar-pal');
-    btn.disabled = jaRegistrado;
-    btn.textContent = jaRegistrado ? 'Palpite já registrado' : 'Salvar palpite';
+    document.getElementById('pal-g1').disabled = bloqueado;
+    document.getElementById('pal-g2').disabled = bloqueado;
+    btn.disabled = bloqueado;
+    btn.textContent = bloqueado ? 'Palpite já registrado' : 'Salvar palpite';
+    aviso.style.display = bloqueado ? 'block' : 'none';
     div.style.display = 'block';
-    const aviso = document.getElementById('aviso-bloqueado');
-    aviso.style.display = jaRegistrado ? 'block' : 'none';
   } else {
     div.style.display = 'none';
-    document.getElementById('aviso-bloqueado').style.display = 'none';
+    aviso.style.display = 'none';
+    btn.disabled = false;
+    btn.textContent = 'Salvar palpite';
   }
 }
 window.onPalJogoChange = onPalJogoChange;
@@ -491,62 +445,50 @@ async function salvarPalpite() {
   const jogoId = document.getElementById('pal-jogo').value;
   if (!jogoId) { flash('msg-pal-err'); return; }
   const key = currentUser + '__' + jogoId;
-  if (state.palpites[key] && !isAdmin) {
-    flash('msg-pal-bloqueado'); return;
-  }
+  if (state.palpites[key] && !isAdmin) { return; }
   const g1 = parseInt(document.getElementById('pal-g1').value) || 0;
   const g2 = parseInt(document.getElementById('pal-g2').value) || 0;
   const btn = document.getElementById('btn-salvar-pal');
   btn.disabled = true; btn.textContent = 'Salvando...';
   try {
-    await savePalpite(key, { participante: currentUser, jogoId, g1, g2 });
-    state.palpites[key] = { participante: currentUser, jogoId, g1, g2 };
+    const entry = { participante: currentUser, jogoId: jogoId, g1: g1, g2: g2 };
+    await savePalpite(key, entry);
+    state.palpites[key] = entry;
     flash('msg-pal-ok');
     renderMeusPalpites();
     onPalJogoChange();
-  } catch(e) { alert('Erro ao salvar. Tente novamente.'); }
-  btn.disabled = false; btn.textContent = 'Salvar palpite';
+  } catch(e) {
+    alert('Erro ao salvar. Tente novamente.');
+    btn.disabled = false;
+    btn.textContent = 'Salvar palpite';
+  }
 }
 window.salvarPalpite = salvarPalpite;
 
-function calcPontos(pal, res) {
-  if (pal.g1 === res.g1 && pal.g2 === res.g2) return 2;
-  const vr = res.g1 > res.g2 ? 1 : res.g1 < res.g2 ? 2 : 0;
-  const vp = pal.g1 > pal.g2 ? 1 : pal.g1 < pal.g2 ? 2 : 0;
-  return vr === vp ? 1 : 0;
-}
-
 function renderMeusPalpites() {
   const lista = document.getElementById('lista-meus-palpites');
-  const meus = Object.values(state.palpites).filter(p => p.participante === currentUser);
+  const meus = Object.values(state.palpites).filter(function(p) { return p.participante === currentUser; });
   if (meus.length === 0) { lista.innerHTML = '<div class="empty">Nenhum palpite registrado ainda.</div>'; return; }
-  lista.innerHTML = meus.map(p => {
-    const jogo = state.jogos.find(j => j.id === p.jogoId);
+  lista.innerHTML = meus.map(function(p) {
+    const jogo = state.jogos.find(function(j) { return j.id === p.jogoId; });
     if (!jogo) return '';
     const res = state.resultados[p.jogoId];
     let ptsBadge = '';
     if (res) {
       const pts = calcPontos(p, res);
-      ptsBadge = `<span class="pts-badge pts-${pts}">${pts===2?'✓ +2pts':pts===1?'✓ +1pt':'✗ 0pts'}</span>`;
+      ptsBadge = '<span class="pts-badge pts-' + pts + '">' + (pts === 2 ? '✓ +2pts' : pts === 1 ? '✓ +1pt' : '✗ 0pts') + '</span>';
     }
-    return `<div class="pal-item">
-      <div>
-        <div class="pal-jogo">${jogo.time1} × ${jogo.time2}</div>
-        <div style="font-size:12px;color:var(--text-muted)">${jogo.fase}</div>
-      </div>
-      <div style="text-align:right">
-        <div class="pal-score">${p.g1} × ${p.g2}</div>
-        ${ptsBadge}
-      </div>
-    </div>`;
+    return '<div class="pal-item"><div><div style="font-size:14px;font-weight:500">' + jogo.time1 + ' × ' + jogo.time2 + '</div><div style="font-size:12px;color:var(--text-muted)">' + jogo.fase + '</div></div><div style="text-align:right"><div class="pal-score">' + p.g1 + ' × ' + p.g2 + '</div>' + ptsBadge + '</div></div>';
   }).join('');
 }
 
-// --- RANKING ---
+// ---- RANKING ----
 function renderRanking() {
-  const pontos = {}, exatos = {}, acertos = {};
-  state.participantes.forEach(p => { pontos[p] = 0; exatos[p] = 0; acertos[p] = 0; });
-  Object.values(state.palpites).forEach(pal => {
+  const pontos = {};
+  const exatos = {};
+  const acertos = {};
+  state.participantes.forEach(function(p) { pontos[p] = 0; exatos[p] = 0; acertos[p] = 0; });
+  Object.values(state.palpites).forEach(function(pal) {
     const res = state.resultados[pal.jogoId];
     if (!res) return;
     const pts = calcPontos(pal, res);
@@ -554,7 +496,7 @@ function renderRanking() {
     if (pts === 2) exatos[pal.participante] = (exatos[pal.participante] || 0) + 1;
     if (pts >= 1) acertos[pal.participante] = (acertos[pal.participante] || 0) + 1;
   });
-  const sorted = state.participantes.slice().sort((a,b) => (pontos[b]||0) - (pontos[a]||0));
+  const sorted = state.participantes.slice().sort(function(a, b) { return (pontos[b] || 0) - (pontos[a] || 0); });
   const el = document.getElementById('ranking-lista');
   const hasRes = Object.keys(state.resultados).length > 0;
   if (sorted.length === 0 || !hasRes) {
@@ -562,28 +504,15 @@ function renderRanking() {
     document.getElementById('card-share').style.display = 'none';
     return;
   }
-  const medals = ['🥇','🥈','🥉'];
-  el.innerHTML = sorted.map((nome, i) => {
+  const medals = ['🥇', '🥈', '🥉'];
+  el.innerHTML = sorted.map(function(nome, i) {
     const pts = pontos[nome] || 0;
-    const pos = i < 3 ? `<span class="medal">${medals[i]}</span>` : `<span style="font-size:13px;color:var(--text-muted);margin-right:8px">${i+1}º</span>`;
-    return `<div class="rank-row">
-      <div style="display:flex;align-items:center;flex:1">
-        ${pos}
-        <div>
-          <div class="rank-name">${nome}</div>
-          <div class="rank-detail">✓ placar: ${exatos[nome]||0} · vencedor: ${acertos[nome]||0}</div>
-        </div>
-      </div>
-      <div style="text-align:right">
-        <div class="rank-pts">${pts}</div>
-        <div class="rank-pts-label">pts</div>
-      </div>
-    </div>`;
+    const pos = i < 3 ? '<span style="font-size:16px;margin-right:6px">' + medals[i] + '</span>' : '<span style="font-size:13px;color:var(--text-muted);margin-right:8px">' + (i + 1) + 'º</span>';
+    return '<div class="rank-row"><div style="display:flex;align-items:center;flex:1">' + pos + '<div><div class="rank-name">' + nome + '</div><div class="rank-detail">✓ placar: ' + (exatos[nome] || 0) + ' · vencedor: ' + (acertos[nome] || 0) + '</div></div></div><div style="text-align:right"><div class="rank-pts">' + pts + '</div><div class="rank-pts-label">pts</div></div></div>';
   }).join('');
-
   const jogosApurados = Object.keys(state.resultados).length;
-  let txt = `⚽ *RANKING BOLÃO COPA 2026*\n(${jogosApurados} jogo${jogosApurados!==1?'s':''} apurado${jogosApurados!==1?'s':''})\n\n`;
-  sorted.forEach((nome, i) => { txt += `${i<3?medals[i]:(i+1)+'º'} ${nome} — ${pontos[nome]||0} pts\n`; });
+  let txt = '⚽ *RANKING BOLÃO COPA 2026*\n(' + jogosApurados + ' jogo' + (jogosApurados !== 1 ? 's' : '') + ' apurado' + (jogosApurados !== 1 ? 's' : '') + ')\n\n';
+  sorted.forEach(function(nome, i) { txt += (i < 3 ? medals[i] : (i + 1) + 'º') + ' ' + nome + ' — ' + (pontos[nome] || 0) + ' pts\n'; });
   txt += '\n📌 2pts = placar exato | 1pt = acertou o vencedor';
   document.getElementById('txt-ranking').value = txt;
   document.getElementById('card-share').style.display = 'block';
@@ -591,16 +520,50 @@ function renderRanking() {
 window.renderRanking = renderRanking;
 
 function copiarRanking() {
-  navigator.clipboard.writeText(document.getElementById('txt-ranking').value).catch(()=>{});
+  navigator.clipboard.writeText(document.getElementById('txt-ranking').value).catch(function() {});
   flash('msg-copy');
 }
 window.copiarRanking = copiarRanking;
 
-// --- RESULTADO ---
+// ---- RESULTADO ----
+function onResJogoChange() {
+  const jogoId = document.getElementById('res-jogo').value;
+  const jogo = state.jogos.find(function(j) { return j.id === jogoId; });
+  const div = document.getElementById('res-teams');
+  if (jogo) {
+    document.getElementById('res-team1-label').textContent = jogo.time1;
+    document.getElementById('res-team2-label').textContent = jogo.time2;
+    const res = state.resultados[jogoId];
+    document.getElementById('res-g1').value = res ? res.g1 : 0;
+    document.getElementById('res-g2').value = res ? res.g2 : 0;
+    div.style.display = 'block';
+  } else {
+    div.style.display = 'none';
+  }
+}
+window.onResJogoChange = onResJogoChange;
+
+async function salvarResultado() {
+  const jogoId = document.getElementById('res-jogo').value;
+  if (!jogoId) { flash('msg-res-err'); return; }
+  const g1 = parseInt(document.getElementById('res-g1').value) || 0;
+  const g2 = parseInt(document.getElementById('res-g2').value) || 0;
+  try {
+    await saveResultado(jogoId, { g1: g1, g2: g2 });
+    state.resultados[jogoId] = { g1: g1, g2: g2 };
+    flash('msg-res-ok');
+    renderAdmin();
+  } catch(e) {
+    alert('Erro ao salvar resultado.');
+  }
+}
+window.salvarResultado = salvarResultado;
+
+// ---- ADMIN ----
 function onAdminPalChange() {
   const part = document.getElementById('admin-pal-part').value;
   const jogoId = document.getElementById('admin-pal-jogo').value;
-  const jogo = state.jogos.find(j => j.id === jogoId);
+  const jogo = state.jogos.find(function(j) { return j.id === jogoId; });
   const div = document.getElementById('admin-pal-teams');
   if (part && jogo) {
     document.getElementById('admin-pal-team1').textContent = jogo.time1;
@@ -610,7 +573,9 @@ function onAdminPalChange() {
     document.getElementById('admin-pal-g1').value = existing ? existing.g1 : 0;
     document.getElementById('admin-pal-g2').value = existing ? existing.g2 : 0;
     div.style.display = 'block';
-  } else { div.style.display = 'none'; }
+  } else {
+    div.style.display = 'none';
+  }
 }
 window.onAdminPalChange = onAdminPalChange;
 
@@ -622,69 +587,41 @@ async function adminSalvarPalpite() {
   const g2 = parseInt(document.getElementById('admin-pal-g2').value) || 0;
   const key = part + '__' + jogoId;
   try {
-    await savePalpite(key, { participante: part, jogoId, g1, g2 });
-    state.palpites[key] = { participante: part, jogoId, g1, g2 };
+    const entry = { participante: part, jogoId: jogoId, g1: g1, g2: g2 };
+    await savePalpite(key, entry);
+    state.palpites[key] = entry;
     flash('msg-admin-pal-ok');
-  } catch(e) { alert('Erro ao salvar.'); }
+  } catch(e) {
+    alert('Erro ao salvar.');
+  }
 }
 window.adminSalvarPalpite = adminSalvarPalpite;
 
-
-  const jogoId = document.getElementById('res-jogo').value;
-  const jogo = state.jogos.find(j => j.id === jogoId);
-  const div = document.getElementById('res-teams');
-  if (jogo) {
-    document.getElementById('res-team1-label').textContent = jogo.time1;
-    document.getElementById('res-team2-label').textContent = jogo.time2;
-    const res = state.resultados[jogoId];
-    document.getElementById('res-g1').value = res ? res.g1 : 0;
-    document.getElementById('res-g2').value = res ? res.g2 : 0;
-    div.style.display = 'block';
-  } else { div.style.display = 'none'; }
-}
-window.onResJogoChange = onResJogoChange;
-
-async function salvarResultado() {
-  const jogoId = document.getElementById('res-jogo').value;
-  if (!jogoId) { flash('msg-res-err'); return; }
-  const g1 = parseInt(document.getElementById('res-g1').value) || 0;
-  const g2 = parseInt(document.getElementById('res-g2').value) || 0;
-  try {
-    await saveResultado(jogoId, { g1, g2 });
-    state.resultados[jogoId] = { g1, g2 };
-    flash('msg-res-ok');
-    renderAdmin();
-  } catch(e) { alert('Erro ao salvar resultado.'); }
-}
-window.salvarResultado = salvarResultado;
-
-// --- ADMIN ---
 function renderAdmin() {
   const chips = document.getElementById('chips-part');
   chips.innerHTML = state.participantes.length === 0
     ? '<div style="font-size:13px;color:var(--text-muted)">Nenhum participante ainda.</div>'
-    : state.participantes.map(p => `<div class="chip">${p}<button class="chip-remove" onclick="removeParticipante('${p}')" aria-label="Remover ${p}">×</button></div>`).join('');
+    : state.participantes.map(function(p) {
+        return '<div class="chip">' + p + '<button class="chip-remove" onclick="removeParticipante(\'' + p + '\')" aria-label="Remover ' + p + '">×</button></div>';
+      }).join('');
 
   const lj = document.getElementById('lista-jogos-admin');
   lj.innerHTML = state.jogos.length === 0
     ? '<div class="empty" style="padding:1rem 0">Nenhum jogo cadastrado.</div>'
-    : state.jogos.map(j => {
+    : state.jogos.map(function(j) {
         const res = state.resultados[j.id];
-        const badge = res ? `<span class="badge-resultado">✓ ${res.g1}×${res.g2}</span>` : `<span class="badge-pendente">Aguardando</span>`;
-        return `<div class="game-item"><div class="game-name">${j.time1} × ${j.time2}</div><div class="game-meta">${j.fase} ${badge}</div></div>`;
+        const badge = res ? '<span class="badge-ok">✓ ' + res.g1 + '×' + res.g2 + '</span>' : '<span class="badge-wait">Aguardando</span>';
+        return '<div class="game-item"><div class="game-name">' + j.time1 + ' × ' + j.time2 + '</div><div class="game-meta">' + j.fase + ' ' + badge + '</div></div>';
       }).join('');
 
-  const selRes = document.getElementById('res-jogo');
-  selRes.innerHTML = '<option value="">Selecione...</option>' +
-    state.jogos.map(j => `<option value="${j.id}">${j.time1} × ${j.time2} (${j.fase})</option>`).join('');
+  document.getElementById('res-jogo').innerHTML = '<option value="">Selecione...</option>' +
+    state.jogos.map(function(j) { return '<option value="' + j.id + '">' + j.time1 + ' × ' + j.time2 + ' (' + j.fase + ')</option>'; }).join('');
   document.getElementById('res-teams').style.display = 'none';
 
-  const selAdminPart = document.getElementById('admin-pal-part');
-  selAdminPart.innerHTML = '<option value="">Selecione...</option>' +
-    state.participantes.map(p => `<option value="${p}">${p}</option>`).join('');
-  const selAdminJogo = document.getElementById('admin-pal-jogo');
-  selAdminJogo.innerHTML = '<option value="">Selecione...</option>' +
-    state.jogos.map(j => `<option value="${j.id}">${j.time1} × ${j.time2} (${j.fase})</option>`).join('');
+  document.getElementById('admin-pal-part').innerHTML = '<option value="">Selecione...</option>' +
+    state.participantes.map(function(p) { return '<option value="' + p + '">' + p + '</option>'; }).join('');
+  document.getElementById('admin-pal-jogo').innerHTML = '<option value="">Selecione...</option>' +
+    state.jogos.map(function(j) { return '<option value="' + j.id + '">' + j.time1 + ' × ' + j.time2 + ' (' + j.fase + ')</option>'; }).join('');
   document.getElementById('admin-pal-teams').style.display = 'none';
 }
 
@@ -700,8 +637,8 @@ async function addParticipante() {
 window.addParticipante = addParticipante;
 
 async function removeParticipante(nome) {
-  if (!confirm(`Remover ${nome}?`)) return;
-  state.participantes = state.participantes.filter(p => p !== nome);
+  if (!confirm('Remover ' + nome + '?')) return;
+  state.participantes = state.participantes.filter(function(p) { return p !== nome; });
   await saveConfig();
   renderAdmin(); populateSelectNome();
 }
@@ -712,7 +649,7 @@ async function addJogo() {
   const t2 = document.getElementById('jogo-t2').value.trim();
   if (!t1 || !t2) return;
   const fase = document.getElementById('jogo-fase').value;
-  state.jogos.push({ id: Date.now().toString(), time1: t1, time2: t2, fase });
+  state.jogos.push({ id: Date.now().toString(), time1: t1, time2: t2, fase: fase });
   document.getElementById('jogo-t1').value = '';
   document.getElementById('jogo-t2').value = '';
   await saveJogos();
@@ -731,11 +668,13 @@ async function mudarSenha() {
 }
 window.mudarSenha = mudarSenha;
 
-// --- INIT ---
-loadAll().then(() => {
+// ---- INIT ----
+loadAll().then(function() {
   populateSelectNome();
   startListeners();
   document.getElementById('loading').style.display = 'none';
+}).catch(function(e) {
+  document.getElementById('loading').innerHTML = '<div style="text-align:center;color:var(--red);padding:2rem">Erro ao conectar com o Firebase.<br>Verifique as regras do Firestore.</div>';
 });
 </script>
 </body>
