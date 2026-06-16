@@ -203,6 +203,27 @@
     </div>
 
     <div class="card">
+      <div class="card-title">Pontos iniciais (saldo anterior)</div>
+      <div style="font-size:13px;color:var(--text-muted);margin-bottom:12px">Esses pontos são somados ao ranking gerado pelo sistema. Use para importar um ranking já em andamento.</div>
+      <div id="lista-pontos-iniciais" style="margin-bottom:12px"></div>
+      <label>Participante</label>
+      <select id="pi-part"><option value="">Selecione...</option></select>
+      <label>Pontos iniciais</label>
+      <input type="number" id="pi-pts" min="0" value="0" />
+      <button class="btn btn-green" onclick="salvarPontosIniciais()">Salvar pontos iniciais</button>
+      <div class="msg msg-ok" id="msg-pi-ok">Pontos salvos!</div>
+      <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
+        <div style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px">Importação rápida</div>
+        <div style="font-size:13px;color:var(--text-muted);margin-bottom:10px">Importa o ranking atual com os pontos já acumulados antes do sistema.</div>
+        <div style="font-size:13px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px;margin-bottom:10px">
+          Beco 10 | Ana 9 | Leonardo 9 | Helena 8<br>Teteu 7 | Eve Jr 7 | Alda 7 | Maisa 7 | Everaldo 4
+        </div>
+        <button class="btn btn-outline" onclick="importarPontosRapido()">Importar pontos do ranking anterior</button>
+        <div class="msg msg-ok" id="msg-import-ok">Ranking anterior importado!</div>
+      </div>
+    </div>
+
+    <div class="card">
       <div class="card-title">Jogos</div>
       <div style="display:flex;gap:8px">
         <div style="flex:1"><label>Time 1</label><input type="text" id="jogo-t1" placeholder="Brasil" /></div>
@@ -304,7 +325,7 @@ var jogosRef = doc(db, 'bolao', 'jogos');
 var palpitesRef = doc(db, 'bolao', 'palpites');
 var resultadosRef = doc(db, 'bolao', 'resultados');
 
-var state = { participantes: [], jogos: [], palpites: {}, resultados: {}, senha: 'copa2026' };
+var state = { participantes: [], jogos: [], palpites: {}, resultados: {}, senha: 'copa2026', pontosIniciais: {} };
 var currentUser = null;
 var isAdmin = false;
 
@@ -315,7 +336,7 @@ function gerarPin() {
 async function loadAll() {
   var results = await Promise.all([getDoc(configRef), getDoc(jogosRef), getDoc(palpitesRef), getDoc(resultadosRef)]);
   var c = results[0]; var j = results[1]; var p = results[2]; var r = results[3];
-  if (c.exists()) { state.participantes = c.data().participantes || []; state.senha = c.data().senha || 'copa2026'; }
+  if (c.exists()) { state.participantes = c.data().participantes || []; state.senha = c.data().senha || 'copa2026'; state.pontosIniciais = c.data().pontosIniciais || {}; }
   if (j.exists()) { state.jogos = j.data().lista || []; }
   if (p.exists()) { state.palpites = p.data() || {}; }
   if (r.exists()) { state.resultados = r.data() || {}; }
@@ -326,6 +347,7 @@ function startListeners() {
     if (!snap.exists()) return;
     state.participantes = snap.data().participantes || [];
     state.senha = snap.data().senha || 'copa2026';
+    state.pontosIniciais = snap.data().pontosIniciais || {};
     populateSelectNome();
     if (isAdmin) renderAdmin();
   });
@@ -349,7 +371,7 @@ function startListeners() {
   });
 }
 
-async function saveConfig() { await setDoc(configRef, { participantes: state.participantes, senha: state.senha }); }
+async function saveConfig() { await setDoc(configRef, { participantes: state.participantes, senha: state.senha, pontosIniciais: state.pontosIniciais }); }
 async function saveJogos() { await setDoc(jogosRef, { lista: state.jogos }); }
 async function savePalpite(key, val) { await setDoc(palpitesRef, { [key]: val }, { merge: true }); }
 async function saveResultado(jogoId, val) { await setDoc(resultadosRef, { [jogoId]: val }, { merge: true }); }
@@ -522,7 +544,7 @@ function renderMeusPalpites() {
 
 function calcRanking() {
   var pontos = {}; var exatos = {}; var acertos = {};
-  state.participantes.forEach(function(p) { pontos[p.nome] = 0; exatos[p.nome] = 0; acertos[p.nome] = 0; });
+  state.participantes.forEach(function(p) { pontos[p.nome] = state.pontosIniciais[p.nome] || 0; exatos[p.nome] = 0; acertos[p.nome] = 0; });
   Object.values(state.palpites).forEach(function(pal) {
     var res = state.resultados[pal.jogoId];
     if (!res) return;
@@ -738,6 +760,13 @@ function renderAdmin() {
 
   document.getElementById('admin-pal-part').innerHTML = '<option value="">Selecione...</option>' +
     state.participantes.map(function(p) { return '<option value="' + p.nome + '">' + p.nome + '</option>'; }).join('');
+
+  document.getElementById('pi-part').innerHTML = '<option value="">Selecione...</option>' +
+    state.participantes.map(function(p) {
+      var pts = state.pontosIniciais[p.nome] || 0;
+      return '<option value="' + p.nome + '">' + p.nome + (pts ? ' (' + pts + ' pts)' : '') + '</option>';
+    }).join('');
+  renderListaPontosIniciais();
   document.getElementById('admin-pal-jogo').innerHTML = '<option value="">Selecione...</option>' +
     state.jogos.map(function(j) { return '<option value="' + j.id + '">' + j.time1 + ' x ' + j.time2 + ' (' + j.fase + ')</option>'; }).join('');
   document.getElementById('admin-pal-teams').style.display = 'none';
@@ -820,6 +849,34 @@ function exportarExcel() {
   flash('msg-backup-ok');
 }
 window.exportarExcel = exportarExcel;
+
+function salvarPontosIniciais() {
+  var part = document.getElementById('pi-part').value;
+  var pts = parseInt(document.getElementById('pi-pts').value) || 0;
+  if (!part) return;
+  state.pontosIniciais[part] = pts;
+  saveConfig().then(function() {
+    flash('msg-pi-ok');
+    renderAdmin();
+  });
+}
+window.salvarPontosIniciais = salvarPontosIniciais;
+
+function renderListaPontosIniciais() {
+  var el = document.getElementById('lista-pontos-iniciais');
+  var nomes = Object.keys(state.pontosIniciais).filter(function(n) { return state.pontosIniciais[n] > 0; });
+  if (nomes.length === 0) { el.innerHTML = '<div style="font-size:13px;color:var(--text-muted)">Nenhum ponto inicial definido.</div>'; return; }
+  el.innerHTML = nomes.map(function(n) {
+    return '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px"><span style="font-weight:500">' + n + '</span><span style="font-weight:700;color:var(--green)">' + state.pontosIniciais[n] + ' pts</span></div>';
+  }).join('');
+}
+
+function importarPontosRapido() {
+  var dados = {"Beco":10,"Ana":9,"Leonardo":9,"Helena":8,"Teteu":7,"Eve Jr":7,"Alda":7,"Maisa":7,"Everaldo":4};
+  Object.keys(dados).forEach(function(nome) { state.pontosIniciais[nome] = dados[nome]; });
+  saveConfig().then(function() { flash('msg-import-ok'); renderAdmin(); renderRanking(); });
+}
+window.importarPontosRapido = importarPontosRapido;
 
 loadAll().then(function() {
   populateSelectNome();
