@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bolão Copa 2026</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  :root {
+    --green: #1a7a4a; --green-light: #e8f5ee;
+    --gold: #c9a227; --gold-light: #fdf6e3;
+    --text: #1a1a1a; --text-muted: #666;
+    --border: #e0e0e0; --bg: #f7f8f6;
+    --white: #ffffff; --red: #c0392b;
+    --radius: 10px; --radius-sm: 6px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  header { background: var(--green); color: white; padding: 1rem 1.25rem; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+  header h1 { font-size: 16px; font-weight: 600; }
+  .header-sub { font-size: 11px; opacity: 0.75; margin-top: 1px; }
+  nav { background: var(--white); border-bottom: 1px solid var(--border); display: flex; overflow-x: auto; }
+  nav button { flex: 1; min-width: 80px; padding: 12px 8px; font-size: 13px; font-weight: 500; color: var(--text-muted); border: none; background: none; cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; }
+  nav button.active { color: var(--green); border-bottom-color: var(--green); }
+  main { max-width: 520px; margin: 0 auto; padding: 1.25rem 1rem 4rem; }
+  .section { display: none; } .section.active { display: block; }
+  .card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; margin-bottom: 1rem; }
+  .card-title { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 1rem; }
+  label { font-size: 13px; color: var(--text-muted); display: block; margin-bottom: 4px; margin-top: 14px; }
+  label:first-of-type { margin-top: 0; }
+  input[type="text"], input[type="password"], input[type="number"], select { width: 100%; padding: 10px 12px; font-size: 15px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--white); color: var(--text); outline: none; }
+  input:focus, select:focus { border-color: var(--green); }
+  input:disabled { background: #f0f0f0; color: var(--text-muted); cursor: not-allowed; }
+  .score-row { display: flex; align-items: center; gap: 10px; }
+  .score-row input { width: 72px; text-align: center; font-size: 22px; font-weight: 600; }
+  .score-sep { font-size: 20px; color: var(--text-muted); }
+  .score-teams { display: flex; justify-content: space-between; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--text-muted); }
+  .btn { display: block; width: 100%; padding: 12px; font-size: 15px; font-weight: 600; border-radius: var(--radius-sm); border: none; cursor: pointer; margin-top: 16px; }
+  .btn-green { background: var(--green); color: white; }
+  .btn-outline { background: transparent; color: var(--green); border: 1px solid var(--green); }
+  .btn-sm { display: inline-block; width: auto; padding: 6px 14px; font-size: 13px; margin-top: 0; }
+  .btn-copy { background: var(--gold); color: white; }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .msg { font-size: 13px; text-align: center; margin-top: 10px; padding: 8px; border-radius: var(--radius-sm); display: none; }
+  .msg-ok { background: var(--green-light); color: var(--green); }
+  .msg-err { background: #fde8e8; color: var(--red); }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .chip { background: var(--green-light); color: var(--green); border-radius: 20px; padding: 5px 14px; font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 6px; }
+  .chip-remove { background: none; border: none; color: var(--green); font-size: 18px; cursor: pointer; line-height: 1; padding: 0; opacity: 0.6; }
+  .rank-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); }
+  .rank-row:last-child { border-bottom: none; }
+  .rank-name { font-size: 15px; font-weight: 600; flex: 1; }
+  .rank-detail { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .rank-pts { font-size: 22px; font-weight: 700; color: var(--green); }
+  .rank-pts-label { font-size: 11px; color: var(--text-muted); text-align: right; }
+  .game-item { padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .game-item:last-child { border-bottom: none; }
+  .game-name { font-size: 14px; font-weight: 600; }
+  .game-meta { font-size: 12px; color: var(--text-muted); margin-top: 4px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .badge-ok { background: var(--green-light); color: var(--green); font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px; }
+  .badge-wait { background: #fff3cd; color: #856404; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px; }
+  .badge-aberto { background: #e8f5ee; color: #1a7a4a; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px; }
+  .badge-fechado { background: #fde8e8; color: var(--red); font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px; }
+  .pal-item { padding: 10px 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  .pal-item:last-child { border-bottom: none; }
+  .pal-score { font-size: 16px; font-weight: 700; color: var(--green); }
+  .pts-badge { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 20px; }
+  .pts-3 { background: var(--gold-light); color: var(--gold); }
+  .pts-2 { background: var(--gold-light); color: var(--gold); }
+  .pts-1 { background: var(--green-light); color: var(--green); }
+  .pts-0 { background: #f0f0f0; color: var(--text-muted); }
+  .login-screen { max-width: 340px; margin: 3rem auto; }
+  .login-screen .card { text-align: center; }
+  .login-icon { font-size: 40px; margin-bottom: 1rem; }
+  .empty { text-align: center; padding: 2rem 0; color: var(--text-muted); font-size: 14px; }
+  textarea.ranking-txt { width: 100%; height: 140px; font-size: 13px; font-family: monospace; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px; resize: none; background: var(--bg); color: var(--text); margin-top: 10px; }
+  .welcome-banner { background: var(--green); color: white; border-radius: var(--radius); padding: 1.25rem; margin-bottom: 1rem; }
+  .welcome-banner h2 { font-size: 18px; font-weight: 700; }
+  .welcome-banner p { font-size: 13px; opacity: 0.85; margin-top: 4px; }
+  .aviso-lock { display: none; margin-top: 10px; font-size: 13px; color: var(--text-muted); text-align: center; background: #f0f0f0; padding: 8px; border-radius: var(--radius-sm); }
+  .loading-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; z-index: 999; font-size: 15px; color: var(--green); font-weight: 600; }
+  .spinner { width: 32px; height: 32px; border: 3px solid var(--green-light); border-top-color: var(--green); border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 12px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .pin-box { background: var(--bg); border: 1px dashed var(--border); border-radius: var(--radius-sm); padding: 8px 14px; font-size: 22px; font-weight: 700; letter-spacing: 6px; color: var(--green); text-align: center; margin-top: 8px; }
+  .part-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 8px; }
+  .part-table th { text-align: left; color: var(--text-muted); font-weight: 500; padding: 6px 4px; border-bottom: 1px solid var(--border); }
+  .part-table td { padding: 8px 4px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  .part-table tr:last-child td { border-bottom: none; }
+  .toggle { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
+  .toggle input { opacity: 0; width: 0; height: 0; }
+  .slider { position: absolute; inset: 0; background: #ccc; border-radius: 24px; cursor: pointer; transition: 0.2s; }
+  .slider:before { content: ''; position: absolute; height: 18px; width: 18px; left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: 0.2s; }
+  input:checked + .slider { background: var(--green); }
+  input:checked + .slider:before { transform: translateX(20px); }
+  .view-pal-row { padding: 10px 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  .view-pal-row:last-child { border-bottom: none; }
+  .view-pal-nome { font-size: 14px; font-weight: 500; }
+  .sem-palpite { font-size: 13px; color: var(--text-muted); font-style: italic; }
+</style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loading"><div class="spinner"></div> Carregando...</div>
+
+<header>
+  <div>
+    <h1>&#9917; Bolão Copa 2026</h1>
+    <div class="header-sub" id="header-sub">Selecione seu nome para entrar</div>
+  </div>
+  <span>&#127942;</span>
+</header>
+
+<nav id="main-nav" style="display:none">
+  <button class="active" onclick="showTab('meus-palpites')">Meus palpites</button>
+  <button onclick="showTab('ranking')">Ranking</button>
+  <button id="btn-admin-tab" onclick="showTab('admin')" style="display:none">Admin</button>
+</nav>
+
+<main>
+
+  <!-- SELECAO -->
+  <div id="screen-select" class="section active">
+    <div class="welcome-banner"><h2>Olá! &#128075;</h2><p>Selecione seu nome e digite seu PIN para entrar.</p></div>
+    <div class="card">
+      <div class="card-title">Quem é você?</div>
+      <select id="select-nome" style="font-size:16px;padding:12px">
+        <option value="">Selecione seu nome...</option>
+      </select>
+      <label>PIN (4 dígitos)</label>
+      <input type="password" id="select-pin" maxlength="4" placeholder="&#8226; &#8226; &#8226; &#8226;" style="letter-spacing:8px;font-size:20px;text-align:center" />
+      <button class="btn btn-green" onclick="entrarComoParticipante()">Entrar</button>
+      <div class="msg msg-err" id="msg-select-err">Nome ou PIN incorreto.</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <div style="font-size:13px;color:var(--text-muted);margin-bottom:10px">Você é o administrador?</div>
+      <button class="btn btn-outline btn-sm" onclick="showAdminLogin()">Entrar como admin</button>
+    </div>
+  </div>
+
+  <!-- LOGIN ADMIN -->
+  <div id="screen-admin-login" class="section">
+    <div class="login-screen">
+      <div class="card">
+        <div class="login-icon">&#128274;</div>
+        <div class="card-title">Acesso do administrador</div>
+        <label>Senha</label>
+        <input type="password" id="admin-senha" placeholder="Digite a senha" />
+        <button class="btn btn-green" onclick="loginAdmin()">Entrar</button>
+        <div class="msg msg-err" id="msg-admin-err">Senha incorreta.</div>
+        <button class="btn btn-outline" style="margin-top:8px" onclick="voltarInicio()">Voltar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MEUS PALPITES -->
+  <div id="tab-meus-palpites" class="section">
+    <div class="card">
+      <div class="card-title">Inserir palpite</div>
+      <label>Jogo</label>
+      <select id="pal-jogo" onchange="onPalJogoChange()"><option value="">Selecione o jogo...</option></select>
+      <div id="pal-teams" style="margin-top:12px;display:none">
+        <div class="score-teams"><span id="pal-team1-label">Time 1</span><span id="pal-team2-label">Time 2</span></div>
+        <div class="score-row">
+          <input type="number" id="pal-g1" min="0" max="20" value="0" />
+          <span class="score-sep">x</span>
+          <input type="number" id="pal-g2" min="0" max="20" value="0" />
+        </div>
+      </div>
+      <div id="aviso-lock" class="aviso-lock">&#128274; Palpite já registrado. Só o admin pode alterar.</div>
+      <button class="btn btn-green" id="btn-salvar-pal" onclick="salvarPalpite()">Salvar palpite</button>
+      <div class="msg msg-ok" id="msg-pal-ok">Palpite salvo!</div>
+      <div class="msg msg-err" id="msg-pal-err">Selecione um jogo.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Meus palpites registrados</div>
+      <div id="lista-meus-palpites"><div class="empty">Nenhum palpite ainda.</div></div>
+    </div>
+  </div>
+
+  <!-- RANKING -->
+  <div id="tab-ranking" class="section">
+    <div class="card">
+      <div class="card-title">Classificação geral</div>
+      <div id="ranking-lista"><div class="empty">Nenhum resultado apurado ainda.</div></div>
+    </div>
+    <div class="card" id="card-share" style="display:none">
+      <div class="card-title">Compartilhar no WhatsApp</div>
+      <textarea class="ranking-txt" id="txt-ranking" readonly></textarea>
+      <button class="btn btn-copy" onclick="copiarRanking()">Copiar texto</button>
+      <div class="msg msg-ok" id="msg-copy">Copiado! Cole no grupo.</div>
+    </div>
+  </div>
+
+  <!-- ADMIN -->
+  <div id="tab-admin" class="section">
+
+    <div class="card">
+      <div class="card-title">Participantes</div>
+      <label>Nome</label>
+      <input type="text" id="novo-part" placeholder="Ex: Tio João" />
+      <button class="btn btn-green" onclick="addParticipante()">Adicionar participante</button>
+      <div class="msg msg-ok" id="msg-part-ok">Adicionado!</div>
+      <div id="tabela-participantes" style="margin-top:14px"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Pontos iniciais (saldo anterior)</div>
+      <div style="font-size:13px;color:var(--text-muted);margin-bottom:12px">Esses pontos são somados ao ranking gerado pelo sistema. Use para importar um ranking já em andamento.</div>
+      <div id="lista-pontos-iniciais" style="margin-bottom:12px"></div>
+      <label>Participante</label>
+      <select id="pi-part"><option value="">Selecione...</option></select>
+      <label>Pontos iniciais</label>
+      <input type="number" id="pi-pts" min="0" value="0" />
+      <button class="btn btn-green" onclick="salvarPontosIniciais()">Salvar pontos iniciais</button>
+      <div class="msg msg-ok" id="msg-pi-ok">Pontos salvos!</div>
+      <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
+        <div style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px">Importação rápida</div>
+        <div style="font-size:13px;color:var(--text-muted);margin-bottom:10px">Importa o ranking atual com os pontos já acumulados antes do sistema.</div>
+        <div style="font-size:13px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px;margin-bottom:10px">
+          Beco 10 | Ana 9 | Leonardo 9 | Helena 8<br>Teteu 7 | Eve Jr 7 | Alda 7 | Maisa 7 | Everaldo 4
+        </div>
+        <button class="btn btn-outline" onclick="importarPontosRapido()">Importar pontos do ranking anterior</button>
+        <div class="msg msg-ok" id="msg-import-ok">Ranking anterior importado!</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Jogos</div>
+      <div style="display:flex;gap:8px">
+        <div style="flex:1"><label>Time 1</label><input type="text" id="jogo-t1" placeholder="Brasil" /></div>
+        <div style="flex:1"><label>Time 2</label><input type="text" id="jogo-t2" placeholder="Argentina" /></div>
+      </div>
+      <label>Fase</label>
+      <select id="jogo-fase">
+        <option>Fase de grupos</option><option>16 avos</option><option>Oitavas</option><option>Quartas</option><option>Semifinal</option><option>Final</option>
+      </select>
+      <button class="btn btn-green" onclick="addJogo()">Adicionar jogo</button>
+      <div class="msg msg-ok" id="msg-jogo-ok">Jogo adicionado!</div>
+      <div id="lista-jogos-admin" style="margin-top:14px"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Inserir resultado real</div>
+      <label>Jogo</label>
+      <select id="res-jogo" onchange="onResJogoChange()"><option value="">Selecione...</option></select>
+      <div id="res-teams" style="margin-top:12px;display:none">
+        <div class="score-teams"><span id="res-team1-label">Time 1</span><span id="res-team2-label">Time 2</span></div>
+        <div class="score-row">
+          <input type="number" id="res-g1" min="0" max="20" value="0" />
+          <span class="score-sep">x</span>
+          <input type="number" id="res-g2" min="0" max="20" value="0" />
+        </div>
+      </div>
+      <button class="btn btn-green" onclick="salvarResultado()">Salvar resultado</button>
+      <div class="msg msg-ok" id="msg-res-ok">Resultado salvo!</div>
+      <div class="msg msg-err" id="msg-res-err">Selecione um jogo.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Ver palpites por jogo</div>
+      <label>Selecione o jogo</label>
+      <select id="view-pal-jogo" onchange="verPalpitesJogo()"><option value="">Selecione...</option></select>
+      <div id="view-palpites-lista" style="margin-top:14px"></div>
+      <div id="view-palpites-share" style="display:none;margin-top:12px">
+        <textarea id="txt-palpites-jogo" class="ranking-txt" readonly style="height:200px"></textarea>
+        <button class="btn btn-copy" onclick="copiarPalpitesJogo()">Copiar para WhatsApp</button>
+        <div class="msg msg-ok" id="msg-copy-palpites">Copiado!</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Editar palpite de participante</div>
+      <label>Participante</label>
+      <select id="admin-pal-part" onchange="onAdminPalChange()"><option value="">Selecione...</option></select>
+      <label>Jogo</label>
+      <select id="admin-pal-jogo" onchange="onAdminPalChange()"><option value="">Selecione...</option></select>
+      <div id="admin-pal-teams" style="margin-top:12px;display:none">
+        <div class="score-teams"><span id="admin-pal-team1">Time 1</span><span id="admin-pal-team2">Time 2</span></div>
+        <div class="score-row">
+          <input type="number" id="admin-pal-g1" min="0" max="20" value="0" />
+          <span class="score-sep">x</span>
+          <input type="number" id="admin-pal-g2" min="0" max="20" value="0" />
+        </div>
+      </div>
+      <button class="btn btn-green" onclick="adminSalvarPalpite()">Salvar palpite</button>
+      <div class="msg msg-ok" id="msg-admin-pal-ok">Palpite salvo!</div>
+      <div class="msg msg-err" id="msg-admin-pal-err">Selecione participante e jogo.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Backup</div>
+      <div style="font-size:13px;color:var(--text-muted);margin-bottom:12px">Exporta todos os dados para Excel com abas: participantes, jogos, palpites, resultados e ranking.</div>
+      <button class="btn btn-green" onclick="exportarExcel()">&#8595; Baixar backup Excel</button>
+      <div class="msg msg-ok" id="msg-backup-ok">Backup gerado!</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Configurações</div>
+      <label>Nova senha admin</label>
+      <input type="password" id="nova-senha" placeholder="Digite a nova senha" />
+      <button class="btn btn-outline" onclick="mudarSenha()">Alterar senha</button>
+      <div class="msg msg-ok" id="msg-senha-ok">Senha alterada!</div>
+      <button class="btn" style="background:#f0f0f0;color:var(--text-muted);margin-top:8px" onclick="sair()">Sair</button>
+    </div>
+
+  </div>
+</main>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getFirestore, doc, getDoc, setDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+var firebaseConfig = {
+  apiKey: "AIzaSyAu1Cl5s6UYkR4ssIwtkVkTKNSBxLiLYNA",
+  authDomain: "bolao-copa-2026-mmpg.firebaseapp.com",
+  projectId: "bolao-copa-2026-mmpg",
+  storageBucket: "bolao-copa-2026-mmpg.firebasestorage.app",
+  messagingSenderId: "854753817539",
+  appId: "1:854753817539:web:405416ecb9a21e30850376"
+};
+
+var app = initializeApp(firebaseConfig);
+var db = getFirestore(app);
+var configRef = doc(db, 'bolao-fase2', 'config');
+var jogosRef = doc(db, 'bolao-fase2', 'jogos');
+var palpitesRef = doc(db, 'bolao-fase2', 'palpites');
+var resultadosRef = doc(db, 'bolao-fase2', 'resultados');
+
+var state = { participantes: [], jogos: [], palpites: {}, resultados: {}, senha: 'copa2026', pontosIniciais: {} };
+var currentUser = null;
+var isAdmin = false;
+
+function gerarPin() {
+  return String(Math.floor(1000 + Math.random() * 9000));
+}
+
+async function loadAll() {
+  var results = await Promise.all([getDoc(configRef), getDoc(jogosRef), getDoc(palpitesRef), getDoc(resultadosRef)]);
+  var c = results[0]; var j = results[1]; var p = results[2]; var r = results[3];
+  if (c.exists()) { state.participantes = c.data().participantes || []; state.senha = c.data().senha || 'copa2026'; state.pontosIniciais = c.data().pontosIniciais || {}; }
+  if (j.exists()) { state.jogos = j.data().lista || []; }
+  if (p.exists()) { state.palpites = p.data() || {}; }
+  if (r.exists()) { state.resultados = r.data() || {}; }
+}
+
+function startListeners() {
+  onSnapshot(configRef, function(snap) {
+    if (!snap.exists()) return;
+    state.participantes = snap.data().participantes || [];
+    state.senha = snap.data().senha || 'copa2026';
+    state.pontosIniciais = snap.data().pontosIniciais || {};
+    populateSelectNome();
+    if (isAdmin) renderAdmin();
+  });
+  onSnapshot(jogosRef, function(snap) {
+    if (!snap.exists()) return;
+    state.jogos = snap.data().lista || [];
+    populatePalJogoSelect();
+    if (isAdmin) renderAdmin();
+  });
+  onSnapshot(palpitesRef, function(snap) {
+    if (!snap.exists()) return;
+    state.palpites = snap.data() || {};
+    if (currentUser && !isAdmin) renderMeusPalpites();
+  });
+  onSnapshot(resultadosRef, function(snap) {
+    if (!snap.exists()) return;
+    state.resultados = snap.data() || {};
+    if (currentUser && !isAdmin) renderMeusPalpites();
+    renderRanking();
+    if (isAdmin) renderAdmin();
+  });
+}
+
+async function saveConfig() { await setDoc(configRef, { participantes: state.participantes, senha: state.senha, pontosIniciais: state.pontosIniciais }); }
+async function saveJogos() { await setDoc(jogosRef, { lista: state.jogos }); }
+async function savePalpite(key, val) { await setDoc(palpitesRef, { [key]: val }, { merge: true }); }
+async function saveResultado(jogoId, val) { await setDoc(resultadosRef, { [jogoId]: val }, { merge: true }); }
+
+function flash(id) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.style.display = 'block';
+  setTimeout(function() { el.style.display = 'none'; }, 2500);
+}
+
+function calcPontos(pal, res) {
+  if (pal.g1 === res.g1 && pal.g2 === res.g2) return 3;
+  var vr = res.g1 > res.g2 ? 1 : res.g1 < res.g2 ? 2 : 0;
+  var vp = pal.g1 > pal.g2 ? 1 : pal.g1 < pal.g2 ? 2 : 0;
+  return vr === vp ? 1 : 0;
+}
+
+function showTab(name) {
+  ['meus-palpites','ranking','admin'].forEach(function(t) { document.getElementById('tab-'+t).classList.remove('active'); });
+  document.querySelectorAll('nav button').forEach(function(b) { b.classList.remove('active'); });
+  document.getElementById('tab-'+name).classList.add('active');
+  var idx = ['meus-palpites','ranking','admin'].indexOf(name);
+  document.querySelectorAll('nav button')[idx].classList.add('active');
+  if (name === 'ranking') renderRanking();
+  if (name === 'meus-palpites') { populatePalJogoSelect(); renderMeusPalpites(); }
+  if (name === 'admin') renderAdmin();
+}
+window.showTab = showTab;
+
+function populateSelectNome() {
+  var sel = document.getElementById('select-nome');
+  sel.innerHTML = '<option value="">Selecione seu nome...</option>' +
+    state.participantes.map(function(p) { return '<option value="' + p.nome + '">' + p.nome + '</option>'; }).join('');
+}
+
+function entrarComoParticipante() {
+  var nome = document.getElementById('select-nome').value;
+  var pin = document.getElementById('select-pin').value.trim();
+  if (!nome || !pin) { flash('msg-select-err'); return; }
+  var part = state.participantes.find(function(p) { return p.nome === nome; });
+  if (!part || part.pin !== pin) { flash('msg-select-err'); return; }
+  currentUser = nome; isAdmin = false;
+  document.getElementById('screen-select').classList.remove('active');
+  document.getElementById('main-nav').style.display = 'flex';
+  document.getElementById('btn-admin-tab').style.display = 'none';
+  document.getElementById('header-sub').textContent = nome;
+  populatePalJogoSelect();
+  renderMeusPalpites();
+  showTab('meus-palpites');
+}
+window.entrarComoParticipante = entrarComoParticipante;
+
+function showAdminLogin() {
+  document.getElementById('screen-select').classList.remove('active');
+  document.getElementById('screen-admin-login').classList.add('active');
+}
+window.showAdminLogin = showAdminLogin;
+
+function loginAdmin() {
+  var senha = document.getElementById('admin-senha').value;
+  if (senha !== state.senha) { flash('msg-admin-err'); return; }
+  isAdmin = true; currentUser = 'Admin';
+  document.getElementById('screen-admin-login').classList.remove('active');
+  document.getElementById('main-nav').style.display = 'flex';
+  document.getElementById('btn-admin-tab').style.display = 'block';
+  document.getElementById('header-sub').textContent = 'Administrador';
+  showTab('admin');
+}
+window.loginAdmin = loginAdmin;
+
+function voltarInicio() {
+  document.getElementById('screen-admin-login').classList.remove('active');
+  document.getElementById('screen-select').classList.add('active');
+  document.getElementById('admin-senha').value = '';
+}
+window.voltarInicio = voltarInicio;
+
+function sair() {
+  currentUser = null; isAdmin = false;
+  document.getElementById('main-nav').style.display = 'none';
+  ['meus-palpites','ranking','admin'].forEach(function(t) { document.getElementById('tab-'+t).classList.remove('active'); });
+  document.getElementById('screen-select').classList.add('active');
+  document.getElementById('admin-senha').value = '';
+  document.getElementById('select-pin').value = '';
+  document.getElementById('header-sub').textContent = 'Selecione seu nome para entrar';
+  populateSelectNome();
+}
+window.sair = sair;
+
+function populatePalJogoSelect() {
+  var sel = document.getElementById('pal-jogo');
+  var jogosAbertos = state.jogos.filter(function(j) {
+    var key = currentUser + '__' + j.id;
+    return j.aberto === true && !state.palpites[key];
+  });
+  if (jogosAbertos.length === 0) {
+    sel.innerHTML = '<option value="">Nenhum jogo disponivel</option>';
+  } else {
+    sel.innerHTML = '<option value="">Selecione o jogo...</option>' +
+      jogosAbertos.map(function(j) { return '<option value="' + j.id + '">' + j.time1 + ' x ' + j.time2 + ' (' + j.fase + ')</option>'; }).join('');
+  }
+  document.getElementById('pal-teams').style.display = 'none';
+  document.getElementById('aviso-lock').style.display = 'none';
+  var btn = document.getElementById('btn-salvar-pal');
+  btn.disabled = false; btn.textContent = 'Salvar palpite';
+}
+
+function onPalJogoChange() {
+  var jogoId = document.getElementById('pal-jogo').value;
+  var jogo = state.jogos.find(function(j) { return j.id === jogoId; });
+  var div = document.getElementById('pal-teams');
+  if (jogo) {
+    document.getElementById('pal-team1-label').textContent = jogo.time1;
+    document.getElementById('pal-team2-label').textContent = jogo.time2;
+    document.getElementById('pal-g1').value = 0;
+    document.getElementById('pal-g2').value = 0;
+    document.getElementById('pal-g1').disabled = false;
+    document.getElementById('pal-g2').disabled = false;
+    document.getElementById('btn-salvar-pal').disabled = false;
+    document.getElementById('btn-salvar-pal').textContent = 'Salvar palpite';
+    document.getElementById('aviso-lock').style.display = 'none';
+    div.style.display = 'block';
+  } else {
+    div.style.display = 'none';
+  }
+}
+window.onPalJogoChange = onPalJogoChange;
+
+async function salvarPalpite() {
+  var jogoId = document.getElementById('pal-jogo').value;
+  if (!jogoId) { flash('msg-pal-err'); return; }
+  var jogo = state.jogos.find(function(j) { return j.id === jogoId; });
+  if (!jogo || !jogo.aberto) { flash('msg-pal-err'); return; }
+  var g1 = parseInt(document.getElementById('pal-g1').value) || 0;
+  var g2 = parseInt(document.getElementById('pal-g2').value) || 0;
+  var btn = document.getElementById('btn-salvar-pal');
+  btn.disabled = true; btn.textContent = 'Salvando...';
+  var key = currentUser + '__' + jogoId;
+  try {
+    var entry = { participante: currentUser, jogoId: jogoId, g1: g1, g2: g2 };
+    await savePalpite(key, entry);
+    state.palpites[key] = entry;
+    flash('msg-pal-ok');
+    renderMeusPalpites();
+    populatePalJogoSelect();
+  } catch(e) {
+    alert('Erro ao salvar. Tente novamente.');
+    btn.disabled = false; btn.textContent = 'Salvar palpite';
+  }
+}
+window.salvarPalpite = salvarPalpite;
+
+function renderMeusPalpites() {
+  var lista = document.getElementById('lista-meus-palpites');
+  var meus = Object.values(state.palpites).filter(function(p) { return p.participante === currentUser; });
+  if (meus.length === 0) { lista.innerHTML = '<div class="empty">Nenhum palpite registrado ainda.</div>'; return; }
+  lista.innerHTML = meus.map(function(p) {
+    var jogo = state.jogos.find(function(j) { return j.id === p.jogoId; });
+    if (!jogo) return '';
+    var res = state.resultados[p.jogoId];
+    var ptsBadge = '';
+    if (res) {
+      var pts = calcPontos(p, res);
+      ptsBadge = '<span class="pts-badge pts-' + pts + '">' + (pts === 3 ? '+3pts' : pts === 1 ? '+1pt' : '0pts') + '</span>';
+    }
+    return '<div class="pal-item"><div><div style="font-size:14px;font-weight:500">' + jogo.time1 + ' x ' + jogo.time2 + '</div><div style="font-size:12px;color:var(--text-muted)">' + jogo.fase + '</div></div><div style="text-align:right;display:flex;align-items:center;gap:8px"><div class="pal-score">' + p.g1 + ' x ' + p.g2 + '</div>' + ptsBadge + '</div></div>';
+  }).join('');
+}
+
+function calcRanking() {
+  var pontos = {}; var exatos = {}; var acertos = {};
+  state.participantes.forEach(function(p) { pontos[p.nome] = state.pontosIniciais[p.nome] || 0; exatos[p.nome] = 0; acertos[p.nome] = 0; });
+  Object.values(state.palpites).forEach(function(pal) {
+    var res = state.resultados[pal.jogoId];
+    if (!res) return;
+    var pts = calcPontos(pal, res);
+    pontos[pal.participante] = (pontos[pal.participante] || 0) + pts;
+    if (pts === 3) exatos[pal.participante] = (exatos[pal.participante] || 0) + 1;
+    if (pts >= 1) acertos[pal.participante] = (acertos[pal.participante] || 0) + 1;
+  });
+  var nomes = state.participantes.map(function(p) { return p.nome; });
+  var sorted = nomes.slice().sort(function(a, b) { return (pontos[b] || 0) - (pontos[a] || 0); });
+  return { pontos: pontos, exatos: exatos, acertos: acertos, sorted: sorted };
+}
+
+function renderRanking() {
+  var r = calcRanking();
+  var el = document.getElementById('ranking-lista');
+  var hasRes = Object.keys(state.resultados).length > 0;
+  if (r.sorted.length === 0 || !hasRes) {
+    el.innerHTML = '<div class="empty">Nenhum resultado apurado ainda.</div>';
+    document.getElementById('card-share').style.display = 'none';
+    return;
+  }
+  var medals = ['🥇','🥈','🥉'];
+  el.innerHTML = r.sorted.map(function(nome, i) {
+    var pts = r.pontos[nome] || 0;
+    var pos = i < 3 ? '<span style="font-size:16px;margin-right:6px">' + medals[i] + '</span>' : '<span style="font-size:13px;color:var(--text-muted);margin-right:8px">' + (i+1) + 'º</span>';
+    return '<div class="rank-row"><div style="display:flex;align-items:center;flex:1">' + pos + '<div><div class="rank-name">' + nome + '</div><div class="rank-detail">Placar exato: ' + (r.exatos[nome]||0) + ' | Vencedor: ' + (r.acertos[nome]||0) + '</div></div></div><div style="text-align:right"><div class="rank-pts">' + pts + '</div><div class="rank-pts-label">pts</div></div></div>';
+  }).join('');
+  var jogosApurados = Object.keys(state.resultados).length;
+  var txt = 'RANKING BOLAO COPA 2026\n(' + jogosApurados + ' jogo' + (jogosApurados !== 1 ? 's' : '') + ' apurado' + (jogosApurados !== 1 ? 's' : '') + ')\n\n';
+  r.sorted.forEach(function(nome, i) { txt += (i < 3 ? medals[i] : (i+1)+'o') + ' ' + nome + ' - ' + (r.pontos[nome]||0) + ' pts\n'; });
+  txt += '\n3pts = placar exato | 1pt = acertou o vencedor';
+  document.getElementById('txt-ranking').value = txt;
+  document.getElementById('card-share').style.display = 'block';
+}
+window.renderRanking = renderRanking;
+
+function copiarRanking() {
+  navigator.clipboard.writeText(document.getElementById('txt-ranking').value).catch(function() {});
+  flash('msg-copy');
+}
+window.copiarRanking = copiarRanking;
+
+function onResJogoChange() {
+  var jogoId = document.getElementById('res-jogo').value;
+  var jogo = state.jogos.find(function(j) { return j.id === jogoId; });
+  var div = document.getElementById('res-teams');
+  if (jogo) {
+    document.getElementById('res-team1-label').textContent = jogo.time1;
+    document.getElementById('res-team2-label').textContent = jogo.time2;
+    var res = state.resultados[jogoId];
+    document.getElementById('res-g1').value = res ? res.g1 : 0;
+    document.getElementById('res-g2').value = res ? res.g2 : 0;
+    div.style.display = 'block';
+  } else { div.style.display = 'none'; }
+}
+window.onResJogoChange = onResJogoChange;
+
+async function salvarResultado() {
+  var jogoId = document.getElementById('res-jogo').value;
+  if (!jogoId) { flash('msg-res-err'); return; }
+  var g1 = parseInt(document.getElementById('res-g1').value) || 0;
+  var g2 = parseInt(document.getElementById('res-g2').value) || 0;
+  try {
+    await saveResultado(jogoId, { g1: g1, g2: g2 });
+    state.resultados[jogoId] = { g1: g1, g2: g2 };
+    flash('msg-res-ok');
+    renderAdmin();
+  } catch(e) { alert('Erro ao salvar resultado.'); }
+}
+window.salvarResultado = salvarResultado;
+
+async function toggleJogoAberto(jogoId, aberto) {
+  var idx = state.jogos.findIndex(function(j) { return j.id === jogoId; });
+  if (idx < 0) return;
+  state.jogos[idx].aberto = aberto;
+  await saveJogos();
+  renderAdmin();
+}
+window.toggleJogoAberto = toggleJogoAberto;
+
+function verPalpitesJogo() {
+  var jogoId = document.getElementById('view-pal-jogo').value;
+  var lista = document.getElementById('view-palpites-lista');
+  var share = document.getElementById('view-palpites-share');
+  if (!jogoId) { lista.innerHTML = ''; share.style.display = 'none'; return; }
+  var jogo = state.jogos.find(function(j) { return j.id === jogoId; });
+  if (!jogo) return;
+  var res = state.resultados[jogoId];
+
+  var rows = state.participantes.map(function(p) {
+    var key = p.nome + '__' + jogoId;
+    var pal = state.palpites[key];
+    var pts = (pal && res) ? calcPontos(pal, res) : null;
+    return { nome: p.nome, pal: pal, pts: pts };
+  });
+
+  var resTexto = res ? 'Resultado: ' + res.g1 + ' x ' + res.g2 : 'Sem resultado ainda';
+  lista.innerHTML = '<div style="font-size:13px;font-weight:600;color:var(--text-muted);padding-bottom:8px;border-bottom:1px solid var(--border);margin-bottom:4px">' + jogo.time1 + ' x ' + jogo.time2 + ' &nbsp;|&nbsp; ' + resTexto + '</div>' +
+    rows.map(function(row) {
+      var palHtml, ptsBadge = '';
+      if (row.pal) {
+        palHtml = '<span class="pal-score">' + row.pal.g1 + ' x ' + row.pal.g2 + '</span>';
+        if (row.pts !== null) {
+          ptsBadge = '<span class="pts-badge pts-' + row.pts + '">' + (row.pts === 3 ? '+3pts' : row.pts === 1 ? '+1pt' : '0pts') + '</span>';
+        }
+      } else {
+        palHtml = '<span class="sem-palpite">Sem palpite no jogo</span>';
+      }
+      return '<div class="view-pal-row"><div class="view-pal-nome">' + row.nome + '</div><div style="display:flex;align-items:center;gap:8px">' + palHtml + ptsBadge + '</div></div>';
+    }).join('');
+
+  var medals = ['🥇','🥈','🥉'];
+  var txt = 'PALPITES - ' + jogo.time1.toUpperCase() + ' x ' + jogo.time2.toUpperCase() + '\n';
+  if (res) txt += 'Resultado: ' + res.g1 + ' x ' + res.g2 + '\n';
+  txt += '\n';
+  rows.forEach(function(row) {
+    if (row.pal) {
+      var ptsTxt = row.pts !== null ? (' - ' + (row.pts === 3 ? '+3pts' : row.pts === 1 ? '+1pt' : '0pts')) : '';
+      txt += row.nome + ': ' + row.pal.g1 + ' x ' + row.pal.g2 + ptsTxt + '\n';
+    } else {
+      txt += row.nome + ': Sem palpite no jogo\n';
+    }
+  });
+
+  if (res) {
+    var r = calcRanking();
+    var jogosApurados = Object.keys(state.resultados).length;
+    txt += '\nRANKING ATUAL (' + jogosApurados + ' jogo' + (jogosApurados !== 1 ? 's' : '') + ' apurado' + (jogosApurados !== 1 ? 's' : '') + ')\n';
+    r.sorted.forEach(function(nome, i) {
+      txt += (i < 3 ? medals[i] : (i+1)+'o') + ' ' + nome + ' - ' + (r.pontos[nome]||0) + ' pts\n';
+    });
+    txt += '\n3pts = placar exato | 1pt = acertou o vencedor';
+  }
+
+  document.getElementById('txt-palpites-jogo').value = txt;
+  share.style.display = 'block';
+}
+window.verPalpitesJogo = verPalpitesJogo;
+
+function copiarPalpitesJogo() {
+  navigator.clipboard.writeText(document.getElementById('txt-palpites-jogo').value).catch(function() {});
+  flash('msg-copy-palpites');
+}
+window.copiarPalpitesJogo = copiarPalpitesJogo;
+
+function onAdminPalChange() {
+  var part = document.getElementById('admin-pal-part').value;
+  var jogoId = document.getElementById('admin-pal-jogo').value;
+  var jogo = state.jogos.find(function(j) { return j.id === jogoId; });
+  var div = document.getElementById('admin-pal-teams');
+  if (part && jogo) {
+    document.getElementById('admin-pal-team1').textContent = jogo.time1;
+    document.getElementById('admin-pal-team2').textContent = jogo.time2;
+    var key = part + '__' + jogoId;
+    var existing = state.palpites[key];
+    document.getElementById('admin-pal-g1').value = existing ? existing.g1 : 0;
+    document.getElementById('admin-pal-g2').value = existing ? existing.g2 : 0;
+    div.style.display = 'block';
+  } else { div.style.display = 'none'; }
+}
+window.onAdminPalChange = onAdminPalChange;
+
+async function adminSalvarPalpite() {
+  var part = document.getElementById('admin-pal-part').value;
+  var jogoId = document.getElementById('admin-pal-jogo').value;
+  if (!part || !jogoId) { flash('msg-admin-pal-err'); return; }
+  var g1 = parseInt(document.getElementById('admin-pal-g1').value) || 0;
+  var g2 = parseInt(document.getElementById('admin-pal-g2').value) || 0;
+  var key = part + '__' + jogoId;
+  try {
+    var entry = { participante: part, jogoId: jogoId, g1: g1, g2: g2 };
+    await savePalpite(key, entry);
+    state.palpites[key] = entry;
+    flash('msg-admin-pal-ok');
+  } catch(e) { alert('Erro ao salvar.'); }
+}
+window.adminSalvarPalpite = adminSalvarPalpite;
+
+function renderAdmin() {
+  var tabela = document.getElementById('tabela-participantes');
+  if (state.participantes.length === 0) {
+    tabela.innerHTML = '<div style="font-size:13px;color:var(--text-muted)">Nenhum participante ainda.</div>';
+  } else {
+    tabela.innerHTML = '<table class="part-table"><thead><tr><th>Nome</th><th style="text-align:center">PIN</th><th></th></tr></thead><tbody>' +
+      state.participantes.map(function(p) {
+        return '<tr><td style="font-weight:500">' + p.nome + '</td><td style="text-align:center;font-weight:700;letter-spacing:3px;color:var(--green)">' + p.pin + '</td><td style="text-align:right"><button class="btn btn-outline btn-sm" style="color:var(--red);border-color:var(--red)" onclick="removeParticipante(\'' + p.nome + '\')">Remover</button></td></tr>';
+      }).join('') + '</tbody></table>';
+  }
+
+  var lj = document.getElementById('lista-jogos-admin');
+  lj.innerHTML = state.jogos.length === 0
+    ? '<div class="empty" style="padding:1rem 0">Nenhum jogo cadastrado.</div>'
+    : state.jogos.map(function(j) {
+        var res = state.resultados[j.id];
+        var badgeRes = res ? '<span class="badge-ok">' + res.g1 + 'x' + res.g2 + '</span>' : '<span class="badge-wait">Sem resultado</span>';
+        var badgeStatus = j.aberto ? '<span class="badge-aberto">Aberto</span>' : '<span class="badge-fechado">Fechado</span>';
+        var checked = j.aberto ? 'checked' : '';
+        return '<div class="game-item"><div style="display:flex;align-items:center;justify-content:space-between"><div><div class="game-name">' + j.time1 + ' x ' + j.time2 + '</div><div class="game-meta">' + j.fase + ' ' + badgeRes + ' ' + badgeStatus + '</div></div><label class="toggle" title="Abrir/fechar palpites"><input type="checkbox" ' + checked + ' onchange="toggleJogoAberto(\'' + j.id + '\', this.checked)"><span class="slider"></span></label></div></div>';
+      }).join('');
+
+  document.getElementById('res-jogo').innerHTML = '<option value="">Selecione...</option>' +
+    state.jogos.map(function(j) { return '<option value="' + j.id + '">' + j.time1 + ' x ' + j.time2 + ' (' + j.fase + ')</option>'; }).join('');
+  document.getElementById('res-teams').style.display = 'none';
+
+  document.getElementById('view-pal-jogo').innerHTML = '<option value="">Selecione...</option>' +
+    state.jogos.map(function(j) {
+      var res = state.resultados[j.id];
+      return '<option value="' + j.id + '">' + j.time1 + ' x ' + j.time2 + (res ? ' (resultado: ' + res.g1 + 'x' + res.g2 + ')' : '') + '</option>';
+    }).join('');
+  document.getElementById('view-palpites-lista').innerHTML = '';
+  document.getElementById('view-palpites-share').style.display = 'none';
+
+  document.getElementById('admin-pal-part').innerHTML = '<option value="">Selecione...</option>' +
+    state.participantes.map(function(p) { return '<option value="' + p.nome + '">' + p.nome + '</option>'; }).join('');
+
+  document.getElementById('pi-part').innerHTML = '<option value="">Selecione...</option>' +
+    state.participantes.map(function(p) {
+      var pts = state.pontosIniciais[p.nome] || 0;
+      return '<option value="' + p.nome + '">' + p.nome + (pts ? ' (' + pts + ' pts)' : '') + '</option>';
+    }).join('');
+  renderListaPontosIniciais();
+  document.getElementById('admin-pal-jogo').innerHTML = '<option value="">Selecione...</option>' +
+    state.jogos.map(function(j) { return '<option value="' + j.id + '">' + j.time1 + ' x ' + j.time2 + ' (' + j.fase + ')</option>'; }).join('');
+  document.getElementById('admin-pal-teams').style.display = 'none';
+}
+
+async function addParticipante() {
+  var v = document.getElementById('novo-part').value.trim();
+  if (!v) return;
+  var existe = state.participantes.find(function(p) { return p.nome === v; });
+  if (existe) return;
+  state.participantes.push({ nome: v, pin: gerarPin() });
+  document.getElementById('novo-part').value = '';
+  await saveConfig();
+  flash('msg-part-ok');
+  renderAdmin(); populateSelectNome();
+}
+window.addParticipante = addParticipante;
+
+async function removeParticipante(nome) {
+  if (!confirm('Remover ' + nome + '?')) return;
+  state.participantes = state.participantes.filter(function(p) { return p.nome !== nome; });
+  await saveConfig();
+  renderAdmin(); populateSelectNome();
+}
+window.removeParticipante = removeParticipante;
+
+async function addJogo() {
+  var t1 = document.getElementById('jogo-t1').value.trim();
+  var t2 = document.getElementById('jogo-t2').value.trim();
+  if (!t1 || !t2) return;
+  var fase = document.getElementById('jogo-fase').value;
+  state.jogos.push({ id: Date.now().toString(), time1: t1, time2: t2, fase: fase, aberto: false });
+  document.getElementById('jogo-t1').value = '';
+  document.getElementById('jogo-t2').value = '';
+  await saveJogos();
+  flash('msg-jogo-ok');
+  renderAdmin();
+}
+window.addJogo = addJogo;
+
+async function mudarSenha() {
+  var nova = document.getElementById('nova-senha').value.trim();
+  if (!nova) return;
+  state.senha = nova;
+  document.getElementById('nova-senha').value = '';
+  await saveConfig();
+  flash('msg-senha-ok');
+}
+window.mudarSenha = mudarSenha;
+
+function exportarExcel() {
+  var XLSX = window.XLSX;
+  if (!XLSX) { alert('Biblioteca ainda carregando. Tente novamente.'); return; }
+  var wsPartData = [['Nome','PIN']];
+  state.participantes.forEach(function(p) { wsPartData.push([p.nome, p.pin]); });
+  var wsJogosData = [['Time 1','Time 2','Fase','Status','Resultado']];
+  state.jogos.forEach(function(j) {
+    var res = state.resultados[j.id];
+    wsJogosData.push([j.time1, j.time2, j.fase, j.aberto ? 'Aberto' : 'Fechado', res ? (res.g1 + 'x' + res.g2) : '-']);
+  });
+  var wsPalpitesData = [['Participante','Jogo','Palpite','Resultado Real','Pontos']];
+  Object.values(state.palpites).forEach(function(p) {
+    var jogo = state.jogos.find(function(j) { return j.id === p.jogoId; });
+    var jogoNome = jogo ? (jogo.time1 + ' x ' + jogo.time2) : p.jogoId;
+    var res = state.resultados[p.jogoId];
+    wsPalpitesData.push([p.participante, jogoNome, p.g1 + 'x' + p.g2, res ? (res.g1 + 'x' + res.g2) : '-', res ? calcPontos(p, res) : '-']);
+  });
+  var r = calcRanking();
+  var wsRankingData = [['Posicao','Nome','Pontos','Placar Exato','Vencedor Acertado']];
+  r.sorted.forEach(function(nome, i) {
+    wsRankingData.push([i+1, nome, r.pontos[nome]||0, r.exatos[nome]||0, r.acertos[nome]||0]);
+  });
+  var wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(wsPartData), 'Participantes');
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(wsJogosData), 'Jogos');
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(wsPalpitesData), 'Palpites');
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(wsRankingData), 'Ranking');
+  var data = new Date();
+  XLSX.writeFile(wb, 'bolao-copa-2026-backup-' + data.toISOString().slice(0,10) + '.xlsx');
+  flash('msg-backup-ok');
+}
+window.exportarExcel = exportarExcel;
+
+function salvarPontosIniciais() {
+  var part = document.getElementById('pi-part').value;
+  var pts = parseInt(document.getElementById('pi-pts').value) || 0;
+  if (!part) return;
+  state.pontosIniciais[part] = pts;
+  saveConfig().then(function() {
+    flash('msg-pi-ok');
+    renderAdmin();
+  });
+}
+window.salvarPontosIniciais = salvarPontosIniciais;
+
+function renderListaPontosIniciais() {
+  var el = document.getElementById('lista-pontos-iniciais');
+  var nomes = Object.keys(state.pontosIniciais).filter(function(n) { return state.pontosIniciais[n] > 0; });
+  if (nomes.length === 0) { el.innerHTML = '<div style="font-size:13px;color:var(--text-muted)">Nenhum ponto inicial definido.</div>'; return; }
+  el.innerHTML = nomes.map(function(n) {
+    return '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px"><span style="font-weight:500">' + n + '</span><span style="font-weight:700;color:var(--green)">' + state.pontosIniciais[n] + ' pts</span></div>';
+  }).join('');
+}
+
+function importarPontosRapido() {
+  var dados = {"Beco":10,"Ana":9,"Leonardo":9,"Helena":8,"Teteu":7,"Eve Jr":7,"Alda":7,"Maisa":7,"Everaldo":4};
+  Object.keys(dados).forEach(function(nome) { state.pontosIniciais[nome] = dados[nome]; });
+  saveConfig().then(function() { flash('msg-import-ok'); renderAdmin(); renderRanking(); });
+}
+window.importarPontosRapido = importarPontosRapido;
+
+loadAll().then(function() {
+  populateSelectNome();
+  startListeners();
+  document.getElementById('loading').style.display = 'none';
+}).catch(function() {
+  document.getElementById('loading').innerHTML = '<div style="text-align:center;color:var(--red);padding:2rem">Erro ao conectar com o Firebase.<br>Verifique as regras do Firestore.</div>';
+});
+</script>
+</body>
+</html>
